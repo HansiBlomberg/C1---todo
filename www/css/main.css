@@ -3,8 +3,8 @@
 /* Hide donelist and todolist */
 /* we will use javascript to show them */
 /* but only if they have items */
-#todolist,
-#donelist {
+#tododiv,
+#donediv {
     display:none;
        
 }

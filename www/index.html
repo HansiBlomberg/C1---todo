@@ -1,16 +1,16 @@
 ﻿<!DOCTYPE html>
 <html lang="sv-se">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="En att-göra lista!">
-        <title>Frontend Uppgift C1 - TODO</title>
-        
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-        <link rel="stylesheet" href="css/main.css">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="En att-göra lista!">
+    <title>Frontend Uppgift C1 - TODO</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
 <body>
 
     <h1>Att göra!</h1>
@@ -18,23 +18,23 @@
 
 
     <!--input-fält och en knapp för att lägga till saker på listan -->
-    <div id="todoentry"  class="container">
-        
-        <form role="form">
+    <div id="todoentry" class="container">
+
+         <!--<form role="form">-->
             <div class="form-group">
                 <label for="newtodo">Att göra</label>
                 <input type="text" id="newtodo" name="todotext" class="form-control">
-                <button type="submit" class="btn btn-success" id="addtodo">Lägg till!</button>
+                <button type="button" class="btn btn-success" id="addtodo">Lägg till!</button>
             </div>
-        </form>
+        <!--</form>-->
     </div>
 
     <!--Det här är saker vi har att göra-->
-    <div id="todolist" class="container">
-        <span id="todolist-hider">
-            <h3>Att göra:</h3>
-            <ul class="list-group">
-                <!--<li class="list-group-item list-group-item-info">Jag är bara ett exempel!
+    <div id="tododiv" class="container">
+
+        <h3>Att göra:</h3>
+        <ul id="todolist" class="list-group">
+            <!--<li class="list-group-item list-group-item-info">Jag är bara ett exempel!
                  <div class="btn-group btn-group-xs" role="group" aria-label="...">
                     <button type="button" class="todo-done btn btn-success">Klart!</button>
                     <button type="button" class="todo-change btn btn-info">Ändra</button>
@@ -42,16 +42,16 @@
                 </div>
             </li>-->
 
-            </ul>
-        </span>
+        </ul>
+
     </div>
 
     <!--Det här är saker vi har gjort-->
-    <div id="donelist" class="container">
-        <span id="donelist-hider">
-            <h3>Gjort:</h3>
-            <ul class="list-group">
-                <!--<li class="list-group-item list-group-item-success">
+    <div id="donediv" class="container">
+
+        <h3>Gjort:</h3>
+        <ul id="donelist" class="list-group">
+            <!--<li class="list-group-item list-group-item-success">
                 Jag är bara ett exempel
                     <div class="btn-group btn-group-xs" role="group" aria-label="...">
                     <button type="button" class="done-undo btn btn-info">Ångra</button>
@@ -61,11 +61,13 @@
             </li>-->
 
 
-            </ul>
-      </span>
-</div>
+        </ul>
+
+    </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="/scripts/hansikodar.js"></script>
+
 </body>
-</htmllang="en">
+</html>
