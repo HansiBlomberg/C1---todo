@@ -1,0 +1,11 @@
+/* CSS fil för uppgift C1 - TODO lista */
+
+/* Hide donelist and todolist */
+/* we will use javascript to show them */
+/* but only if they have items */
+span #donelist-hider,
+span #todolist-hider {
+    display:none;
+    background-color:rebeccapurple;   
+}
+
