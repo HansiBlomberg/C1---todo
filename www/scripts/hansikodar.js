@@ -12,10 +12,32 @@
     */
 
 
-/* Lägg till ett event på lägg-till knappen */
-/* <button type="submit" class="btn btn-success" id="addtodo">Lägg till!</button> */
+// Add event to the todo add item button
+// <button type="submit" class="btn btn-success" id="addtodo">Lägg till!</button>
 
 $("#addtodo").click(addToDoClicked);
+
+// Add event to the done buttons used on the items on the todo list
+
+$(".todo-done").click(doneClicked);
+
+
+// This function is called when the user clicks the DONE button on an item on the todo list
+// if that happens, we move the item to the done list
+
+function doneClicked() {
+
+    var toDoText; // Will hold the items todo text
+    var listItem; // Will hold the items List Item HTML
+
+    toDoText = $(this).val();
+    alert(toDoText);
+
+
+}
+
+
+
 
 // This function is called when the user click the Add button to add an item to the todo list
 // It will look in the text field #newtodo and if it is not empty or already in the todo list
@@ -23,7 +45,7 @@ $("#addtodo").click(addToDoClicked);
 // if it is in the todo list show an alert
 // if it is in the done list, show an alert and ask user if it should be moved back to the todo list
 function addToDoClicked() {
-    var todoText; // Will hold the text from the textbox to be added to the todo list
+    var toDoText; // Will hold the text from the textbox to be added to the todo list
     var listItem; // Will hold the List Item HTML 
 
     toDoText = $("#newtodo").val();
