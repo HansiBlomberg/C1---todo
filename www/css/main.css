@@ -3,9 +3,22 @@
 /* Hide donelist and todolist */
 /* we will use javascript to show them */
 /* but only if they have items */
-#tododiv,
+#xtododiv,
 #donediv {
-    display:none;
+   display:none;
        
 }
+
+/* Align the buttons that are displayed to the right of every todo item */
+.todo-item-buttons {
+
+    margin-left: 10px;
+
+}
+
+.todo-item-buttons button {
+    margin-right: 5px;
+    
+}
+
 

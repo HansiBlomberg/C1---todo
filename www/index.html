@@ -12,21 +12,21 @@
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-
+    <div class="container"></div>
     <h1>Att göra!</h1>
     <h2>Nu har vi mycket att göra...</h2>
 
 
-    <!--input-fält och en knapp för att lägga till saker på listan -->
-    <div id="todoentry" class="container">
 
-         <!--<form role="form">-->
-            <div class="form-group">
-                <label for="newtodo">Att göra</label>
-                <input type="text" id="newtodo" name="todotext" class="form-control">
-                <button type="button" class="btn btn-success" id="addtodo">Lägg till!</button>
-            </div>
-        <!--</form>-->
+    <div id="todoentry">
+
+        <!--input-fält och en knapp för att lägga till saker på listan -->
+        <div class="form-group">
+            <label for="newtodo">Att göra</label>
+            <input type="text" id="newtodo" name="todotext" class="form-control">
+            <button type="button" class="btn btn-success" id="addtodo">Lägg till!</button>
+        </div>
+
     </div>
 
     <!--Det här är saker vi har att göra-->
@@ -34,14 +34,20 @@
 
         <h3>Att göra:</h3>
         <ul id="todolist" class="list-group">
-            <!--<li class="list-group-item list-group-item-info">Jag är bara ett exempel!
-                 <div class="btn-group btn-group-xs" role="group" aria-label="...">
-                    <button type="button" class="todo-done btn btn-success">Klart!</button>
-                    <button type="button" class="todo-change btn btn-info">Ändra</button>
-                    <button type="button" class="todo-remove btn btn-danger">Ta bort</button>
-                </div>
-            </li>-->
+            <div class="row">
 
+                <!-- ett exempel skall tas bort sen 
+                <div>
+                    <li class="list-group-item list-group-item-info">
+                        Jag är bara ett exempel!<span class="btn-group btn-group-xs todo-item-buttons" role="group" aria-label="...">
+                            <button id="fusk" type="button" value="Jag är bara ett exempel" onclick="doneClicked(this)" class="todo-done btn btn-success">Klart!</button>
+                            <button type="button" class="todo-change btn btn-info">Ändra</button>
+                            <button type="button" class="todo-remove btn btn-danger">Ta bort</button>
+                        </span>
+                    </li>
+                </div>
+            </div>
+                 -->   
         </ul>
 
     </div>
@@ -64,10 +70,10 @@
         </ul>
 
     </div>
-
+    </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="/scripts/hansikodar.js"></script>
+    <script src="scripts/hansikodar.js"></script>
 
 </body>
 </html>
