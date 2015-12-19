@@ -9,16 +9,25 @@
        
 }
 
+/* If we go below 220px things tend to break up */
+body {
+
+    min-width: 220px;
+}
+
+
+
 /* Center the h1 and h2 text*/
 h1, h2 {
     text-align:center;
 
 }
 
-/* Align the buttons that are displayed to the right of every todo item */
+
 .todo-item-buttons {
 
-    margin-left: 10px;
+    width: 180px;
+
 
 }
 
@@ -27,11 +36,22 @@ h1, h2 {
     
 }
 
-/* Justering av todo och done-listornas bredd */
-.list-group {
-    margin-left: 10px;
-    margin-right: 10px;
-        
+.done-remove, .todo-remove {
+    margin-right: 0;
 }
+
+
+.list-group-item {
+
+    margin-left: 3px;
+    margin-right: 3px;
+
+}
+
+
+
+
+
+
 
 

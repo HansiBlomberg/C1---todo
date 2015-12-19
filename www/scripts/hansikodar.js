@@ -54,29 +54,32 @@ function toDoListItemBuilder(toDoText, listType) {
 
     var listItem = ""; // Will hold the items List Item HTML that this function will return
 
+    // col-xs-12 col-md-12 col-lg-12  class="row"
     // Common rows
-    listItem += '<div class="row">';
-    listItem += '  <div>';
-    listItem += '    <li class=".col-xs-12 .col-sm-6 .col-md-8 list-group-item list-group-item-info">'
+    listItem += '<div>';
+   // listItem += '  <div>';
+    listItem += '    <li class="row list-group-item list-group-item-info">'
     listItem += toDoText;
-    listItem += '      <div class=".col-xs-6 .col-md-4 btn-group btn-group-xs todo-item-buttons" role="group" aria-label="...">';
+    listItem += '      <span class="col-xs-6 col-sm-4 col-md-3 col-lg-2 btn-group btn-group-xs todo-item-buttons pull-right" role="group" aria-label="...">';
 
     // Buttons when adding to the TODO list
     if (listType === ListTypeEnum.TODO) {
         listItem += '        <button type="button" value="' + toDoText + '" onclick="doneToDoItem(this)" class="todo-done btn btn-success">Klart!</button>';
         listItem += '        <button type="button" value="' + toDoText + '" onclick="changeToDoItem(this)" class="todo-change btn btn-info">&Auml;ndra</button>';
+        listItem += '        <button type="button" onclick="removeListItem(this)" class="todo-remove btn btn-danger">Ta bort</button>';
     }
 
     // Button when adding to the DONE list
     if (listType === ListTypeEnum.DONE) {
         listItem += '        <button type="button" onclick="undoToDoItem(this)" value="' + toDoText + '" class="done-undo btn btn-info">&Aring;ngra</button>';
+        listItem += '        <button type="button" onclick="removeListItem(this)" class="done-remove btn btn-danger">Ta bort</button>';
     }
 
     // More common rows
-    listItem += '        <button type="button" onclick="removeListItem(this)" class="todo-remove btn btn-danger">Ta bort</button>';
-    listItem += '       </div>';
+   
+    listItem += '       </span>';
     listItem += '    </li>';
-    listItem += '  </div>';
+   // listItem += '  </div>';
     listItem += '</div>';
 
     return listItem;
@@ -177,7 +180,8 @@ function changeToDoItem(theButtonThatGotClicked) {
 // This function will be called for items on both the todo and done list
 function removeListItem(theButtonThatGotClicked) {
 
-    $(theButtonThatGotClicked).parent().parent().parent().parent().remove();
+   // $(theButtonThatGotClicked).parent().parent().parent().parent().remove();
+    $(theButtonThatGotClicked).parent().parent().parent().remove();
 
     // Check if the todo list is empty, if it is hide it
     if ($("#todolist").has("li").length == 0) {
