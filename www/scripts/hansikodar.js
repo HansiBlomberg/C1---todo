@@ -9,6 +9,9 @@ if (debug) debugOn();
     
 debugtext();
 
+// Save the initial text of the #addtodo button because it will be messed with
+initialAddToDoButtonText = $("#addtodo").html();
+
 // Add event to the todo add item button
 $("#addtodo").click(addToDoItem);
 
@@ -161,6 +164,10 @@ function undoToDoItem(theButtonThatGotClicked) {
 // input field for entering a new item.
 // It will disable all buttons in the todo and done lists
 // and rely on the AddToDo function to re-enable them.
+
+// It will also change the text and color of the Add to list button
+// to indicate we are changing something
+
 function changeToDoItem(theButtonThatGotClicked) {
     var toDoText;
 
@@ -179,6 +186,17 @@ function changeToDoItem(theButtonThatGotClicked) {
 
     // And put it into the input field
     $("#newtodo").val(toDoText);
+
+    // Change the text of the input button to "change"
+    $("#addtodo").html('&Auml;ndra');
+    
+    // Set the color of the button to "btn-info"
+    $("#addtodo").removeClass("btn-success").addClass("btn-info");
+    
+
+    
+       
+
 
     focusOnIput();
 
@@ -222,6 +240,10 @@ function addToDoItem() {
     if (toDoText === "") return;
     if (toDoText === "debugON") debugOn();
     if (toDoText === "debugOFF") debugOff();
+
+    // Set the color and text of the #addtido button to "btn-success" and its original text because it might have been changed by another function call
+    $("#addtodo").removeClass("btn-info").addClass("btn-success");
+    $("#addtodo").html(initialAddToDoButtonText);
 
     // Clear the text from the input field
     $("#newtodo").val("");
