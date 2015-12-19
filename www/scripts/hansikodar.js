@@ -7,12 +7,10 @@
 debug = false;
 if (debug) debugOn();
     
-
 debugtext();
 
 // Add event to the todo add item button
 $("#addtodo").click(addToDoItem);
-
 
 // This will make the enter key work to add items from the todo input field
 $('#newtodo').bind("enterKey", addToDoItem);
@@ -63,10 +61,10 @@ function toDoListItemBuilder(toDoText, listType) {
 
     var listItem = ""; // Will hold the items List Item HTML that this function will return
 
-    // col-xs-12 col-md-12 col-lg-12  class="row"
+   
     // Common rows
     listItem += '<div>';
-   // listItem += '  <div>';
+    // listItem += '  <div>';
     listItem += '    <li class="row list-group-item list-group-item-info">'
     listItem += toDoText;
     listItem += '      <span class="col-xs-6 col-sm-4 col-md-3 col-lg-2 btn-group btn-group-xs todo-item-buttons pull-right" role="group" aria-label="...">';
