@@ -31,6 +31,15 @@ var ListTypeEnum = {
 };
 
 
+focusOnIput();
+
+
+// Change focus to the input field
+function focusOnIput() {
+    $("#newtodo").focus();
+}
+
+
 function debugOn() {
 
     debug = true;
@@ -114,6 +123,8 @@ function doneToDoItem(theButtonThatGotClicked) {
     // Make sure the done list is displaying now that we know there is at least one item in it...
     $("#donediv").show();
 
+    focusOnIput();
+
     debugtext();
 
 }
@@ -142,6 +153,8 @@ function undoToDoItem(theButtonThatGotClicked) {
     // Make sure the list is displaying now that we know there is at least one item in it...
     $("#tododiv").show();
 
+    focusOnIput();
+
     debugtext();
 
 }
@@ -169,8 +182,7 @@ function changeToDoItem(theButtonThatGotClicked) {
     // And put it into the input field
     $("#newtodo").val(toDoText);
 
-    // Change focus to the input field
-    $("#newtodo").focus();
+    focusOnIput();
 
     debugtext();
 
@@ -180,7 +192,7 @@ function changeToDoItem(theButtonThatGotClicked) {
 // This function will be called for items on both the todo and done list
 function removeListItem(theButtonThatGotClicked) {
 
-   // $(theButtonThatGotClicked).parent().parent().parent().parent().remove();
+   
     $(theButtonThatGotClicked).parent().parent().parent().remove();
 
     // Check if the todo list is empty, if it is hide it
@@ -193,7 +205,7 @@ function removeListItem(theButtonThatGotClicked) {
     if ($("#donelist").has("li").length == 0) {
         $("#donediv").hide();
     }
-
+    focusOnIput();
     debugtext();
 
 }
@@ -232,7 +244,7 @@ function addToDoItem() {
     // Disable all buttons for all list items
     $("#tododiv :input").attr("disabled", false);
     $("#donediv :input").attr("disabled", false);
-
+    focusOnIput();
     debugtext();
 }
 

@@ -13,22 +13,25 @@
 </head>
 <body>
     <div class="container">
-        <h1>Att göra!</h1>
-        <h2>Nu har vi mycket att göra</h2>
+        <div class="jumbotron">
+            <h1>Att göra!</h1>
+            <div id="todoentry" class="container">
+
+                <!--input-fält och en knapp för att lägga till saker på listan -->
+                <div class="form-group" id="todo-entry-form-group">
+                    <label for="newtodo">Att göra</label>
+                    <input type="text" id="newtodo" name="todotext" class="form-control">
+                    <button type="button" class="btn btn-success" id="addtodo">Lägg till!</button>
+                </div>
+
+            </div>
+            
+        </div>
     </div>
 
 
 
-    <div id="todoentry" class="container">
-
-        <!--input-fält och en knapp för att lägga till saker på listan -->
-        <div class="form-group">
-            <label for="newtodo">Att göra</label>
-            <input type="text" id="newtodo" name="todotext" class="form-control">
-            <button type="button" class="btn btn-success" id="addtodo">Lägg till!</button>
-         </div>
-
-    </div>
+    
 
     <!--Det här är saker vi har att göra-->
     <div id="tododiv" class="container">

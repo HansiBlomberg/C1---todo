@@ -24,6 +24,15 @@ h1, h2 {
 }
 
 
+/* center and give space to the ADD button */
+#addtodo {
+    margin: 20px 0 0 0;
+   
+
+
+}
+
+
 .todo-item-buttons {
 
     width: 180px;
