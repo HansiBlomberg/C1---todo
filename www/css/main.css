@@ -9,6 +9,12 @@
        
 }
 
+/* Center the h1 and h2 text*/
+h1, h2 {
+    text-align:center;
+
+}
+
 /* Align the buttons that are displayed to the right of every todo item */
 .todo-item-buttons {
 
@@ -19,6 +25,13 @@
 .todo-item-buttons button {
     margin-right: 5px;
     
+}
+
+/* Justering av todo och done-listornas bredd */
+.list-group {
+    margin-left: 10px;
+    margin-right: 10px;
+        
 }
 
 

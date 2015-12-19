@@ -4,6 +4,12 @@
 // Hansi Blomberg 2015-12-17
 
 
+debug = false;
+if (debug) debugOn();
+    
+
+debugtext();
+
 // Add event to the todo add item button
 $("#addtodo").click(addToDoItem);
 
@@ -25,6 +31,24 @@ var ListTypeEnum = {
 };
 
 
+function debugOn() {
+
+    debug = true;
+    if( $("#debug").length == 0 ){
+        var debugFields = '<div id="debug"><label for="debuginfo1">Debug: Number of todo list elements</label><input type="text" id="debuginfo1" name="debuginfo1" class="form-control"></div>';
+        $("div .form-group").append(debugFields);
+    } else $("#debug").show();
+
+}
+
+function debugOff() {
+
+    debug = false;
+    $("#debug").hide();
+
+}
+
+
 
 function toDoListItemBuilder(toDoText, listType) {
 
@@ -33,9 +57,9 @@ function toDoListItemBuilder(toDoText, listType) {
     // Common rows
     listItem += '<div class="row">';
     listItem += '  <div>';
-    listItem += '    <li class="list-group-item list-group-item-info">'
+    listItem += '    <li class=".col-xs-12 .col-sm-6 .col-md-8 list-group-item list-group-item-info">'
     listItem += toDoText;
-    listItem += '      <div class="btn-group btn-group-xs todo-item-buttons" role="group" aria-label="...">';
+    listItem += '      <div class=".col-xs-6 .col-md-4 btn-group btn-group-xs todo-item-buttons" role="group" aria-label="...">';
 
     // Buttons when adding to the TODO list
     if (listType === ListTypeEnum.TODO) {
@@ -49,10 +73,11 @@ function toDoListItemBuilder(toDoText, listType) {
     }
 
     // More common rows
-    listItem += '        <button type="button" onclick="removeToDoItem(this)" class="todo-remove btn btn-danger">Ta bort</button>';
+    listItem += '        <button type="button" onclick="removeListItem(this)" class="todo-remove btn btn-danger">Ta bort</button>';
     listItem += '       </div>';
     listItem += '    </li>';
     listItem += '  </div>';
+    listItem += '</div>';
 
     return listItem;
  
@@ -70,16 +95,12 @@ function doneToDoItem(theButtonThatGotClicked) {
    
 
     // Remove the item from the todo list
-    $(theButtonThatGotClicked).parent().parent().detach();
-
-    // Check if the todo list is empty, if it is hide it
-    // alert("I den bästa av världar hade detta varit antalet items i todo listan: " + $('#todolist').children().length);
-    // NOT WORKING!
-    if ($('#todolist').children().length < 1) {
-        $("#tododiv").hide();
-    }
+    removeListItem(theButtonThatGotClicked)
 
 
+    debugtext();
+
+    
     // I dont want my page upside down
     toDoText = stripHTML(toDoText);
 
@@ -89,6 +110,8 @@ function doneToDoItem(theButtonThatGotClicked) {
 
     // Make sure the done list is displaying now that we know there is at least one item in it...
     $("#donediv").show();
+
+    debugtext();
 
 }
 
@@ -101,16 +124,9 @@ function undoToDoItem(theButtonThatGotClicked) {
     toDoText = $(theButtonThatGotClicked).val();
 
     // Remove the item from the done list
-    $(theButtonThatGotClicked).parent().parent().remove();
+    removeListItem(theButtonThatGotClicked)
 
-    // Check if the done list is empty, if it is hide it
-    //  alert("I den bästa av världar hade detta varit antalet items i done listan: " + $('#donelist').children().length);
-    // 7NOT WORKING
-    if ($('#donelist').children().length < 1) {
-        $("#donediv").hide();
-    }
-
-
+   
     // I dont want my page upside down
     toDoText = stripHTML(toDoText);
 
@@ -123,18 +139,26 @@ function undoToDoItem(theButtonThatGotClicked) {
     // Make sure the list is displaying now that we know there is at least one item in it...
     $("#tododiv").show();
 
+    debugtext();
+
 }
 
 // This function will remove the item and insert it in the
 // input field for entering a new item.
+// It will disable all buttons in the todo and done lists
+// and rely on the AddToDo function to re-enable them.
 function changeToDoItem(theButtonThatGotClicked) {
     var toDoText;
 
     // Retrieve the data from the item
     toDoText = $(theButtonThatGotClicked).val();
 
+    // Disable all buttons for all list items
+    $("#tododiv :input").attr("disabled", true);
+    $("#donediv :input").attr("disabled", true);
+
     // Remove the item from the todo list
-    $(theButtonThatGotClicked).parent().parent().detach();
+    removeListItem(theButtonThatGotClicked);
 
     // Not really neccessary, but you never know what the user is fiddlering with
     toDoText = stripHTML(toDoText);
@@ -145,13 +169,28 @@ function changeToDoItem(theButtonThatGotClicked) {
     // Change focus to the input field
     $("#newtodo").focus();
 
+    debugtext();
+
 }
 
 
 // This function will be called for items on both the todo and done list
-function removeToDoItem(theButtonThatGotClicked) {
+function removeListItem(theButtonThatGotClicked) {
 
-    $(theButtonThatGotClicked).parent().parent().remove();
+    $(theButtonThatGotClicked).parent().parent().parent().parent().remove();
+
+    // Check if the todo list is empty, if it is hide it
+    if ($("#todolist").has("li").length == 0) {
+        $("#tododiv").hide();
+    }
+
+
+    // Check if the done list is empty, if it is hide it
+    if ($("#donelist").has("li").length == 0) {
+        $("#donediv").hide();
+    }
+
+    debugtext();
 
 }
 
@@ -167,6 +206,8 @@ function addToDoItem() {
 
     toDoText = $("#newtodo").val();
     if (toDoText === "") return;
+    if (toDoText === "debugON") debugOn();
+    if (toDoText === "debugOFF") debugOff();
 
     // Clear the text from the input field
     $("#newtodo").val("");
@@ -181,6 +222,14 @@ function addToDoItem() {
     
     // Make sure the list is displaying now that we know there is at least one item in it...
     $("#tododiv").show();
+
+    // Make sure all the buttons for all the list items can be used.
+    // They might be disabled if the user was using the changeItem function.
+    // Disable all buttons for all list items
+    $("#tododiv :input").attr("disabled", false);
+    $("#donediv :input").attr("disabled", false);
+
+    debugtext();
 }
 
 
@@ -190,4 +239,13 @@ function stripHTML(dirtyString) {
     var text = document.createTextNode(dirtyString);
     container.appendChild(text);
     return container.innerHTML; // innerHTML will be a xss safe string
+}
+
+
+function debugtext() {
+
+    if (!debug) return;
+
+    $("#debuginfo1").val($("#todolist").has("li").length)
+
 }
