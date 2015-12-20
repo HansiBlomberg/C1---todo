@@ -33,6 +33,48 @@ var ListTypeEnum = {
 
 
 focusOnIput();
+ 
+
+// Just learning how to create an array of objects..
+var myTestToDo = [];
+myTestToDo.push( new toDoItem("date", "deadline", "Do Some Shit!", 20, false, 0, "Kebabtomte"));
+
+
+
+function playWithJson() {
+
+    var todoos = {
+        todo: []
+    };
+
+    todoos.todo.push( { 
+        "CreatedDate": item.firstName,
+        "DeadLine": item.lastName,
+        "Description": item.age,
+        "EstimationTime": item.age,
+        "Finnished": item.firstName,
+        "Id": item.lastName,
+        "Name": item.age,
+     });
+    
+}
+
+
+
+function toDoItem(CreatedDate, DeadLine, Description, EstimationTime, Finnished, Id, Name) {
+    this.CreatedDate = CreatedDate;
+    this.DeadLine = DeadLine;
+    this.Description = Description;
+    this.EstimationTime = EstimationTime;
+    this.Finnished = Finnished;
+    this.Id = Id;
+    this.Name = Name;
+}
+
+
+
+
+
 
 
 // Change focus to the input field
