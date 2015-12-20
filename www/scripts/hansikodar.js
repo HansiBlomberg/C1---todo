@@ -67,7 +67,6 @@ function toDoListItemBuilder(toDoText, listType) {
    
     // Common rows
     listItem += '<div>';
-    // listItem += '  <div>';
     listItem += '    <li class="row list-group-item list-group-item-info">'
     listItem += toDoText;
     listItem += '      <span class="col-xs-6 col-sm-4 col-md-3 col-lg-2 btn-group btn-group-xs todo-item-buttons pull-right" role="group" aria-label="...">';
@@ -76,20 +75,19 @@ function toDoListItemBuilder(toDoText, listType) {
     if (listType === ListTypeEnum.TODO) {
         listItem += '        <button type="button" value="' + toDoText + '" onclick="doneToDoItem(this)" class="todo-done btn btn-success">Klart!</button>';
         listItem += '        <button type="button" value="' + toDoText + '" onclick="changeToDoItem(this)" class="todo-change btn btn-info">&Auml;ndra</button>';
-        listItem += '        <button type="button" onclick="removeListItem(this)" class="todo-remove btn btn-danger">Ta bort</button>';
+        listItem += '        <button type="button" onclick="askToRemoveListItem(this)" class="todo-remove btn btn-danger">Ta bort</button>';
     }
+
 
     // Button when adding to the DONE list
     if (listType === ListTypeEnum.DONE) {
         listItem += '        <button type="button" onclick="undoToDoItem(this)" value="' + toDoText + '" class="done-undo btn btn-info">&Aring;ngra</button>';
-        listItem += '        <button type="button" onclick="removeListItem(this)" class="done-remove btn btn-danger">Ta bort</button>';
+        listItem += '        <button type="button" onclick="askToRemoveListItem(this)" class="done-remove btn btn-danger">Ta bort</button>';
     }
 
     // More common rows
-   
     listItem += '       </span>';
     listItem += '    </li>';
-   // listItem += '  </div>';
     listItem += '</div>';
 
     return listItem;
@@ -110,10 +108,8 @@ function doneToDoItem(theButtonThatGotClicked) {
     // Remove the item from the todo list
     removeListItem(theButtonThatGotClicked)
 
-
     debugtext();
 
-    
     // I dont want my page upside down
     toDoText = stripHTML(toDoText);
 
@@ -194,10 +190,6 @@ function changeToDoItem(theButtonThatGotClicked) {
     $("#addtodo").removeClass("btn-success").addClass("btn-info");
     
 
-    
-       
-
-
     focusOnIput();
 
     debugtext();
@@ -205,17 +197,45 @@ function changeToDoItem(theButtonThatGotClicked) {
 }
 
 
+function askToRemoveListItem(theButtonThatGotClicked) {
+    
+
+    // Lets fire up the modal!
+    // '<a data-toggle="modal" href="#wantToDeleteModal" class="todo-remove btn btn-danger btn-xs">Ta bort</a>';
+
+
+    
+     $('#wantToDeleteModal').modal({
+         show: 'true',
+         backdrop: 'true',
+         keyboard: 'true'
+     });
+
+
+    // Hide modal and exit if user did not want to delete item
+    $('#wantToDeleteModal .go-back-button').click(function () {
+        $('#wantToDeleteModal').modal('hide');
+        return;
+    });
+
+    // Hide modal and delete item if user confirmed
+    $('#wantToDeleteModal .okay-button').click(function () {
+        $('#wantToDeleteModal').modal('hide');
+        removeListItem(theButtonThatGotClicked);
+    });
+
+}
+
 // This function will be called for items on both the todo and done list
 function removeListItem(theButtonThatGotClicked) {
-
-   
+ 
+  
     $(theButtonThatGotClicked).parent().parent().parent().remove();
 
     // Check if the todo list is empty, if it is hide it
     if ($("#todolist").has("li").length == 0) {
         $("#tododiv").hide();
     }
-
 
     // Check if the done list is empty, if it is hide it
     if ($("#donelist").has("li").length == 0) {
