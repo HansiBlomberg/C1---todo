@@ -59,6 +59,34 @@ function playWithJson() {
     
 }
 
+// Builds an array of toDoItem objects based on the ToDo list
+function toDoToJSON(listId) {
+    
+    var todoos = {
+        todo: []
+    };
+
+    // Find the ToDo UL with the id of listId that we take as a parameter
+    $("ul#"+listId+" li").each( function( index, element ) {
+
+        var tempText = $(this).text();
+        var descriptionText = tempText.substring(0, (tempText.length - 59));
+
+        if (debug) alert("Pushing " + descriptionText + " to the json array at element "+index);        
+
+        
+        todoos.todo.push( { 
+            "CreatedDate": Date.now(),
+            "DeadLine": Date.now(),
+            "Description": descriptionText,
+            "EstimationTime": 0,
+            "Finnished" : listId == "donelist" ? true : false,
+            "Name": "testtesttest" });
+    
+    })
+       
+    return todoos;
+}
 
 
 function toDoItem(CreatedDate, DeadLine, Description, EstimationTime, Finnished, Id, Name) {
@@ -108,10 +136,10 @@ function toDoListItemBuilder(toDoText, listType) {
 
    
     // Common rows
-    listItem += '<div>';
+   // listItem += '<div>';
     listItem += '    <li class="row list-group-item list-group-item-info">'
     listItem += toDoText;
-    listItem += '      <span class="col-xs-6 col-sm-4 col-md-3 col-lg-2 btn-group btn-group-xs todo-item-buttons pull-right" role="group" aria-label="...">';
+    listItem += '      <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2 btn-group btn-group-xs todo-item-buttons pull-right" role="group" aria-label="...">';
 
     // Buttons when adding to the TODO list
     if (listType === ListTypeEnum.TODO) {
@@ -128,9 +156,9 @@ function toDoListItemBuilder(toDoText, listType) {
     }
 
     // More common rows
-    listItem += '       </span>';
+    listItem += '       </div>';
     listItem += '    </li>';
-    listItem += '</div>';
+   // listItem += '</div>';
 
     return listItem;
  
@@ -272,7 +300,7 @@ function askToRemoveListItem(theButtonThatGotClicked) {
 function removeListItem(theButtonThatGotClicked) {
  
   
-    $(theButtonThatGotClicked).parent().parent().parent().remove();
+    $(theButtonThatGotClicked).parent().parent().remove();
 
     // Check if the todo list is empty, if it is hide it
     if ($("#todolist").has("li").length == 0) {
@@ -299,9 +327,11 @@ function addToDoItem() {
     var listItem; // Will hold the List Item HTML 
 
     toDoText = $("#newtodo").val();
+
     if (toDoText === "") return;
     if (toDoText === "debugON") debugOn();
     if (toDoText === "debugOFF") debugOff();
+    if (toDoText === ":push") toDoToJSON("todolist");
 
     // Set the color and text of the #addtido button to "btn-success" and its original text because it might have been changed by another function call
     $("#addtodo").removeClass("btn-info").addClass("btn-success");
@@ -312,7 +342,7 @@ function addToDoItem() {
   
     // I dont want my page upside down
     toDoText = stripHTML(toDoText);
-
+    
     // Build the HTML for the list item
     listItem = toDoListItemBuilder(toDoText, ListTypeEnum.TODO);
     
