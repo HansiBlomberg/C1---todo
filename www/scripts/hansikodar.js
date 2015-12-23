@@ -4,10 +4,43 @@
 // Hansi Blomberg 2015-12-17
 
 
+// This will be used as an argument to the toDoListItemBuilder() function
+var ListTypeEnum = {
+    TODO: 1,
+    DONE: 2,
+};
+
 debug = false;
 if (debug) debugOn();
     
 debugtext();
+
+// Get todo list from local storage if available
+var storedToDos; // Will be used to keed a json array
+if (typeof (localStorage) !== "undefined") {
+    if (typeof (localStorage.ToDos) !== "undefined") {
+        storedToDos = JSON.parse(localStorage.ToDos);
+    } 
+       
+} else {
+    // Sorry! No Web Storage support..
+    if (debug) alert("Ingen web storage support!");
+}
+
+// Populate todo lists if we got some items from local storage
+if (typeof (storedToDos) !== "undefined") {
+   
+    for (var i = 0; i < storedToDos.todo.length; i++) {
+        var aToDo = storedToDos.todo[i];
+        $(aToDo.Finnished ? "#donelist" : "#todolist").append(toDoListItemBuilder(aToDo.Description, (aToDo.Finnished ? ListTypeEnum.DONE : ListTypeEnum.TODO)));
+
+    };
+
+    // Show the headers?
+    ShowHeadersWithItems();
+
+}
+
 
 // Save the initial text of the #addtodo button because it will be messed with
 initialAddToDoButtonText = $("#addtodo").html();
@@ -25,67 +58,69 @@ $('#newtodo').keyup(function (e) {
 });
 
 
-// This will be used as an argument to the toDoListItemBuilder() function
-var ListTypeEnum = {
-    TODO: 1,
-    DONE: 2,
-};
-
-
-focusOnIput();
+focusOnInput();
  
 
-// Just learning how to create an array of objects..
-var myTestToDo = [];
-myTestToDo.push( new toDoItem("date", "deadline", "Do Some Shit!", 20, false, 0, "Kebabtomte"));
+function ShowHeadersWithItems() {
+    // Check if the todo list is empty, if it is hide it
+    if ($("#todolist").has("li").length == 0) {
+        $("#tododiv").hide();
+    } else $("#tododiv").show();
+
+    // Check if the done list is empty, if it is hide it
+    if ($("#donelist").has("li").length == 0) {
+        $("#donediv").hide();
+    } else $("#donediv").show();
 
 
-
-function playWithJson() {
-
-    var todoos = {
-        todo: []
-    };
-
-    todoos.todo.push( { 
-        "CreatedDate": item.firstName,
-        "DeadLine": item.lastName,
-        "Description": item.age,
-        "EstimationTime": item.age,
-        "Finnished": item.firstName,
-        "Id": item.lastName,
-        "Name": item.age,
-     });
-    
 }
 
-// Builds an array of toDoItem objects based on the ToDo list
-function toDoToJSON(listId) {
-    
-    var todoos = {
+
+
+function buildJSON() {
+
+    var toDos = {
         todo: []
     };
 
+    toDoToJSON("todolist", "testname", toDos);
+    toDoToJSON("donelist", "testname", toDos);
+
+    return toDos;
+
+}
+
+
+// Builds an array of toDoItem objects based on the ToDo list
+function toDoToJSON(listId, name, toDos) {
+    
+    // Until I find a better way...the .text() method brings in all the button texts etc.
+    // and we need to get rid of that.
+    var cut = 0;
+    if (listId == "todolist") cut = 59;
+    if (listId == "donelist") cut = 45;
+
+    
     // Find the ToDo UL with the id of listId that we take as a parameter
     $("ul#"+listId+" li").each( function( index, element ) {
 
         var tempText = $(this).text();
-        var descriptionText = tempText.substring(0, (tempText.length - 59));
+        var descriptionText = tempText.substring(0, (tempText.length - cut));
 
-        if (debug) alert("Pushing " + descriptionText + " to the json array at element "+index);        
+        if (debug) alert("Pushing " + descriptionText + " to the json array from list #"+ listId + " item " + (index + 1) + ". Done = " + ( listId == "donelist" ? "true" : "false"));
 
         
-        todoos.todo.push( { 
+        toDos.todo.push( { 
             "CreatedDate": Date.now(),
             "DeadLine": Date.now(),
             "Description": descriptionText,
             "EstimationTime": 0,
             "Finnished" : listId == "donelist" ? true : false,
-            "Name": "testtesttest" });
+            "Name": name });
     
     })
        
-    return todoos;
+    
 }
 
 
@@ -100,13 +135,30 @@ function toDoItem(CreatedDate, DeadLine, Description, EstimationTime, Finnished,
 }
 
 
+// Save the current toDo list to local storage
+function saveToDoToLocalWeb() {
 
+    // Can we?
+    if (typeof (Storage) !== "undefined") {
+
+        // Build the JSON object
+        storedToDos = buildJSON();
+        
+        // Put the object into storage
+        localStorage.setItem('ToDos', JSON.stringify(storedToDos));
+
+    } else {
+        // Sorry! No Web Storage support..
+        if (debug) alert("Ingen web storage support!");
+    }
+
+}
 
 
 
 
 // Change focus to the input field
-function focusOnIput() {
+function focusOnInput() {
     $("#newtodo").focus();
 }
 
@@ -176,7 +228,7 @@ function doneToDoItem(theButtonThatGotClicked) {
    
 
     // Remove the item from the todo list
-    removeListItem(theButtonThatGotClicked)
+    removeListItem(theButtonThatGotClicked);
 
     debugtext();
 
@@ -186,11 +238,12 @@ function doneToDoItem(theButtonThatGotClicked) {
     // Add the list item to done list
     listItem = toDoListItemBuilder(toDoText, ListTypeEnum.DONE);
     $("#donelist").append(listItem);
+    saveToDoToLocalWeb();
 
     // Make sure the done list is displaying now that we know there is at least one item in it...
     $("#donediv").show();
 
-    focusOnIput();
+    focusOnInput();
 
     debugtext();
 
@@ -205,7 +258,7 @@ function undoToDoItem(theButtonThatGotClicked) {
     toDoText = $(theButtonThatGotClicked).val();
 
     // Remove the item from the done list
-    removeListItem(theButtonThatGotClicked)
+    removeListItem(theButtonThatGotClicked);
 
    
     // I dont want my page upside down
@@ -217,10 +270,12 @@ function undoToDoItem(theButtonThatGotClicked) {
     // Add the list item to the todo list
     $("#todolist").append(listItem);
 
+    saveToDoToLocalWeb();
+
     // Make sure the list is displaying now that we know there is at least one item in it...
     $("#tododiv").show();
 
-    focusOnIput();
+    focusOnInput();
 
     debugtext();
 
@@ -245,7 +300,7 @@ function changeToDoItem(theButtonThatGotClicked) {
     $("#donediv :input").attr("disabled", true);
 
     // Remove the item from the todo list
-    removeListItem(theButtonThatGotClicked);
+    removeListItemButDontSave(theButtonThatGotClicked);
 
     // Not really neccessary, but you never know what the user is fiddlering with
     toDoText = stripHTML(toDoText);
@@ -260,7 +315,7 @@ function changeToDoItem(theButtonThatGotClicked) {
     $("#addtodo").removeClass("btn-success").addClass("btn-info");
     
 
-    focusOnIput();
+    focusOnInput();
 
     debugtext();
 
@@ -301,20 +356,27 @@ function removeListItem(theButtonThatGotClicked) {
  
   
     $(theButtonThatGotClicked).parent().parent().remove();
-
-    // Check if the todo list is empty, if it is hide it
-    if ($("#todolist").has("li").length == 0) {
-        $("#tododiv").hide();
-    }
-
-    // Check if the done list is empty, if it is hide it
-    if ($("#donelist").has("li").length == 0) {
-        $("#donediv").hide();
-    }
-    focusOnIput();
+    removeListItemButDontSave(theButtonThatGotClicked);
+    saveToDoToLocalWeb();
     debugtext();
 
 }
+
+// This is kind of temporary, dont want save to happen
+// when user is changing a todo-item.
+// Entire change item design is about to change, and then so will this.
+function removeListItemButDontSave(theButtonThatGotClicked) {
+
+
+    $(theButtonThatGotClicked).parent().parent().remove();
+
+    ShowHeadersWithItems();
+  
+    focusOnInput();
+    debugtext();
+
+}
+
 
 
 // This function is called when the user click the Add button to add an item to the todo list
@@ -331,7 +393,8 @@ function addToDoItem() {
     if (toDoText === "") return;
     if (toDoText === "debugON") debugOn();
     if (toDoText === "debugOFF") debugOff();
-    if (toDoText === ":push") toDoToJSON("todolist");
+    if (toDoText === ":push") buildJSON();
+ 
 
     // Set the color and text of the #addtido button to "btn-success" and its original text because it might have been changed by another function call
     $("#addtodo").removeClass("btn-info").addClass("btn-success");
@@ -356,7 +419,9 @@ function addToDoItem() {
     // Disable all buttons for all list items
     $("#tododiv :input").attr("disabled", false);
     $("#donediv :input").attr("disabled", false);
-    focusOnIput();
+
+    saveToDoToLocalWeb();
+    focusOnInput();
     debugtext();
 }
 
@@ -374,6 +439,6 @@ function debugtext() {
 
     if (!debug) return;
 
-    $("#debuginfo1").val($("#todolist").has("li").length)
+    $("#debuginfo1").val($("#todolist").has("li").length);
 
 }
