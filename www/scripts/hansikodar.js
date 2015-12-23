@@ -15,9 +15,23 @@ if (debug) debugOn();
     
 debugtext();
 
+
+// Do we have local storage check
+var hasStorage = (function () {
+    try {
+        localStorage.setItem(mod, mod);
+        localStorage.removeItem(mod);
+        return true;
+    } catch (exception) {
+        return false;
+    }
+}());
+
+
+
 // Get todo list from local storage if available
 var storedToDos; // Will be used to keed a json array
-if (typeof (localStorage) !== "undefined") {
+if (hasStorage) {
     if (typeof (localStorage.ToDos) !== "undefined") {
         storedToDos = JSON.parse(localStorage.ToDos);
     } 
@@ -59,6 +73,9 @@ $('#newtodo').keyup(function (e) {
 
 
 focusOnInput();
+
+
+
  
 
 function ShowHeadersWithItems() {
@@ -139,7 +156,7 @@ function toDoItem(CreatedDate, DeadLine, Description, EstimationTime, Finnished,
 function saveToDoToLocalWeb() {
 
     // Can we?
-    if (typeof (localStorage) !== "undefined") {
+    if (hasStorage) {
 
         // Build the JSON object
         storedToDos = buildJSON();
