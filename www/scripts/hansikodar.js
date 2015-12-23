@@ -139,7 +139,7 @@ function toDoItem(CreatedDate, DeadLine, Description, EstimationTime, Finnished,
 function saveToDoToLocalWeb() {
 
     // Can we?
-    if (typeof (Storage) !== "undefined") {
+    if (typeof (localStorage) !== "undefined") {
 
         // Build the JSON object
         storedToDos = buildJSON();
