@@ -9,7 +9,7 @@
        
 }
 
-/* If we go below 220px things tend to break up */
+/* If we go below 260px things tend to break up */
 body {
 
     min-width: 260px;
