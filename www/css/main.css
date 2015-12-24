@@ -12,7 +12,7 @@
 /* If we go below 220px things tend to break up */
 body {
 
-    min-width: 220px;
+    min-width: 260px;
 }
 
 
@@ -49,6 +49,10 @@ h1, h2 {
     margin-right: 0;
 }
 
+.list-group {
+
+    width: 98%;
+}
 
 .list-group-item {
 
@@ -56,6 +60,7 @@ h1, h2 {
     margin-right: 3px;
 
 }
+
 
 
 

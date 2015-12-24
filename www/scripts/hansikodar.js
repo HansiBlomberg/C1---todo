@@ -19,8 +19,8 @@ debugtext();
 // Do we have local storage check
 var hasStorage = (function () {
     try {
-        localStorage.setItem(mod, mod);
-        localStorage.removeItem(mod);
+        localStorage.setItem("xyzzy", "xyzzy");
+        localStorage.removeItem("xyzzy");
         return true;
     } catch (exception) {
         return false;
