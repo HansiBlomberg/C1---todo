@@ -623,15 +623,17 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
         if (nextAddedToDoLocalId == null) {   // Then it is a new item
 
             var toDoLocalId = ++highestLocalToDoId;
+            var dt = Date.now();
+            var msDate = "\/Date(" + dt.valueOf() + ")\/"; // Microsoft WCF needs this format
 
             var tempToDo = new toDoItem(
                 toDoLocalId,
-                Date.now(),
-                Date.now(),
+                msDate,
+                msDate,
                 toDoText,
                 0,
                 false,
-                null,
+                -1,
                 toDoListName);
 
 
@@ -673,14 +675,30 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
             if (nextAddedToDoLocalId == null) {   // The item is a new item that need to be stored
                 nextAddedToDoLocalId = 0; // Just clearing
                 if (debug) console.log("add todo: storing a NEW item!");
+
+                // Because our todo object is not exactly like the servers, we need to transform it
+                //  Next refactoring: Try the object delete function
+
+                // We have this: 
+                // {"CreatedDate":1451394620806,"DeadLine":1451394620806,"Description":"mat","EstimationTime":0,"Finnished":false,"Id":-1,"Name":"MrInAHurry"}}
+                // We want:
+                // {"CreatedDate":"\/Date(1451390900353+0100)\/","DeadLine":"\/Date(1451563700330+0100)\/","Description":"FOOOOOOD!","EstimationTime":100,"Finnished":true,"Id":-1,"Name":"MrInAHurry"}
+
+
+                var ToDoToStore = { "CreatedDate": tempToDo.CreatedDate, "DeadLine": tempToDo.DeadLine, "Description": tempToDo.Description, "EstimationTime": tempToDo.EstimationTime, "Finnished": tempToDo.Finnished, "Id": tempToDo.Id, "Name": tempToDo.Name };
+
+
+
                 // Method = "POST", UriTemplate = "todo/{name}/new")]
                 $.ajax({
                     type: "POST",
                     url: toDoServerURL + '/todo/' + toDoListName + '/new',
                     success: addTODOOItemSuccess(),
                     dataType: "json",
-                    data: JSON.stringify(tempToDo),
-                    contentType: 'application/json; charset=UTF-8'
+                   
+                    data: JSON.stringify({todo:ToDoToStore}),
+                    // data: JSON.stringify(tempToDo),
+                    contentType: 'application/json; charset=utf-8'
                 });
 
             } else { // We are dealing with an update
