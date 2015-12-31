@@ -7,7 +7,7 @@
 // This will be used as an argument to the toDoListItemBuilder() function
 var ListTypeEnum = {
     TODO: 1,
-    DONE: 2,
+    DONE: 2
 };
 
 
@@ -18,7 +18,10 @@ debugtext();
 
 
 var toDoListName = "MrInAHurry";
+$("#listname").val(toDoListName);
 var toDoServerURL = "https://todoo.netcare.se:1449";
+
+
 
 
 // Do we have local storage check
@@ -36,13 +39,16 @@ var hasLocalStorage = (function () {
 // Do we have TODOO wcf storage check
 
 $.ajaxSetup({
-    "error": function () { hasTODOStorage = (function() {return false;}) }
+    "error": function () {
+        hasTODOStorage = (function ()
+        { return false; });
+    }
 });
 
 hasTODOStorage = (function () {
     
    
-    $.getJSON(toDoServerURL + '/todo/' + toDoListName, function (data) { console.log("From hasTODOStorage data: " + data) });
+    $.getJSON(toDoServerURL + '/todo/' + toDoListName, function (data) { console.log("From hasTODOStorage data: " + data); });
        return true;
 }());
 
@@ -59,58 +65,47 @@ var storedToDos = []; // Will be used to keep a json array with our todo items
 var highestLocalToDoId = 0; // Is needed when creating new todo items, each todo in stored todos need a unique ID never used in the current session.
 var nextAddedToDoLocalId = null; // Gets a value if user is adding a changed item
 
-
-// Get todo list from server storage if available
-if (hasTODOStorage) {
-
-    console.log("We have todo storage!!! YIPPI!! Lets getjson!");
-    
- 
-    $.getJSON(toDoServerURL + '/todo/' + toDoListName, function (data) {
+readPersistedToDo();
 
 
 
-        console.log("data=" + data);
-        console.log("data length = " + data.length);
+function readPersistedToDo() {
+    // Get todo list from server storage if available
+    if (hasTODOStorage) {
 
-        storedToDos = data;
-        
-        
-        //for(i=0; i < data.length; i++ ) {
-        //    // console.log("key=" + key + " val=" + val);
-        //    console.log("data# " + i + " = " + data[i].Description);
-        //    var tempToDo = new toDoItem(data[i].CreatedDate, data[i].DeadLine, data[i].Description, data[i].EstimationTime, data[i].Finnished, data[i].Id, data[i].Name);
-        //    // CreatedDate, DeadLine, Description, EstimationTime, Finnished, Id, Name
-        //    storedToDos.push(tempToDo);
-        //};
+        console.log("We have todo storage!!! YIPPI!! Lets getjson!");
+        $.getJSON(toDoServerURL + '/todo/' + toDoListName, function (data) {
 
+            console.log("data=" + data);
+            console.log("data length = " + data.length);
+            storedToDos = data;
 
-        PopulateToDoLists();
-
-
-
-    });
-
-    console.log("Now what???");
-  
-
-}
-
-else {
-    // Do we have local storage at least?
-    if (hasLocalStorage) {
-        if (typeof (localStorage.getItem(toDoListName)) !== "undefined") {
-            storedToDos = JSON.parse(localStorage.getItem(toDoListName));
             PopulateToDoLists();
 
+
+
+        });
+
+        console.log("Now what???");
+
+
+    }
+
+    else {
+        // Do we have local storage at least?
+        if (hasLocalStorage) {
+            if (typeof (localStorage.getItem(toDoListName)) !== "undefined") {
+                storedToDos = JSON.parse(localStorage.getItem(toDoListName));
+                PopulateToDoLists();
+
+            }
+        }
+        else {
+            // Sorry! No Web Storage support..
+            if (debug) alert("Ingen web storage support!");
         }
     }
-    else {
-        // Sorry! No Web Storage support..
-        if (debug) alert("Ingen web storage support!");
-    }
 }
-
 
 // Populate todo lists if we got some items from local or remote storage
 function PopulateToDoLists() {
@@ -123,10 +118,8 @@ function PopulateToDoLists() {
             // var aToDo = storedToDos.todo[i];
             storedToDos[i].LocalId = i;
             var aToDo = storedToDos[i];
-
             $(aToDo.Finnished ? "#donelist" : "#todolist").append(toDoListItemBuilder(aToDo.LocalId, aToDo.Description, (aToDo.Finnished ? ListTypeEnum.DONE : ListTypeEnum.TODO)));
-
-        };
+        }
 
         // Show the headers?
         ShowHeadersWithItems();
@@ -141,13 +134,34 @@ function PopulateToDoLists() {
     $("#addtodo").click(addToDoItem);
 
     // This will make the enter key work to add items from the todo input field
-    $('#newtodo').bind("enterKey", addToDoItem);
+   // $('#newtodo').bind("enterKey", addToDoItem);
 
-    $('#newtodo').keyup(function (e) {
-        if (e.keyCode == 13) {
-            $(this).trigger("enterKey");
+    //$('#newtodo').keyup(function (e) {
+    //    if (e.keyCode == 13) {
+    //        $(this).trigger("enterKey");
+    //    }
+    //});
+
+
+   
+    $('#newtodo').keypress(function(event){
+        if(event.keyCode == 13){
+            $('#addtodo').click();
         }
     });
+
+    $('#listname').keypress(function (event) {
+        if (event.keyCode == 13) {
+            $('#listnamechange').click();
+        }
+    });
+
+
+
+
+
+    // The List Name Change button
+    $("#listnamechange").click(changeListName);
 
     
     focusOnInput();
@@ -158,18 +172,35 @@ function PopulateToDoLists() {
 
 function ShowHeadersWithItems() {
     // Check if the todo list is empty, if it is hide it
-    if ($("#todolist").has("li").length == 0) {
+    if ($("#todolist").has("li").length === 0) {
         $("#tododiv").hide();
     } else $("#tododiv").show();
 
     // Check if the done list is empty, if it is hide it
-    if ($("#donelist").has("li").length == 0) {
+    if ($("#donelist").has("li").length === 0) {
         $("#donediv").hide();
     } else $("#donediv").show();
 
 
 }
 
+
+
+function changeListName() {
+
+    var listName = $("#listname").val();
+    listName = listName.trim();
+    if (listName === "") return;
+    if (listName === toDoListName) return;
+
+    toDoListName = listName;
+    console.log("changeListName changed toDoListName to " + listName);
+    storedToDos = [];
+    $("#todolist").empty();
+    $("#donelist").empty();
+    readPersistedToDo();
+  
+}
 
 
 
@@ -226,7 +257,8 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
         })
        
     
-    }
+}
+
 
 //
 // Definition of the toDoItem object
@@ -276,7 +308,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
     function debugOn() {
 
         debug = true;
-        if( $("#debug").length == 0 ){
+        if( $("#debug").length === 0 ){
             var debugFields = '<div id="debug"><label for="debuginfo1">Debug: Number of todo list elements</label><input type="text" id="debuginfo1" name="debuginfo1" class="form-control"></div>';
             $("div .form-group").append(debugFields);
         } else $("#debug").show();
@@ -376,7 +408,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
                 type: "PUT",
                 url: toDoServerURL + '/todo/' + toDoListName + '/' + storedToDos[index].Id + '/done',
                 success: changeTODOOItemToDoneSuccess(),
-                dataType: "json",
+                dataType: "json"
             });
 
         }
@@ -436,7 +468,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
                 type: "PUT",
                 url: toDoServerURL + '/todo/' + toDoListName + '/' + storedToDos[index].Id + '/notdone',
                 success: changeTODOOItemToNotDoneSuccess(),
-                dataType: "json",
+                dataType: "json"
             });
 
         }
@@ -560,7 +592,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
                 type: "DELETE",
                 url: toDoServerURL + '/todo/' + toDoListName + '/' + Id + '',
                 success: removeItemFromTODOOSuccess(),
-                dataType: "json",
+                dataType: "json"
             });
             
         }   
@@ -628,7 +660,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
         toDoText = stripHTML(toDoText);
     
         // Check if it is a new item or an edited item
-        if (nextAddedToDoLocalId == null) {   // Then it is a new item
+        if (nextAddedToDoLocalId === null) {   // Then it is a new item
 
             var toDoLocalId = ++highestLocalToDoId;
             var dt = Date.now();
@@ -680,7 +712,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
 
         // If we have todoo server storage, we must either add or change the item now
         if (hasTODOStorage) {
-            if (nextAddedToDoLocalId == null) {   // The item is a new item that need to be stored
+            if (nextAddedToDoLocalId === null) {   // The item is a new item that need to be stored
                 // nextAddedToDoLocalId = 0; // Just clearing
                 console.log("add todo: storing a NEW item!");
 
@@ -726,7 +758,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
                         console.log("testStatus: " + testStatus);
                         console.log("errrorThrown: " + errorThrown);
                     },
-                    dataType: "json",
+                    dataType: "json"
                     
                 });
 
@@ -820,6 +852,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
                 return i;
             }
         }
+        return -1;
     }
 
 
