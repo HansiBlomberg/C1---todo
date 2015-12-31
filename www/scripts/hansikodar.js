@@ -66,7 +66,7 @@ if (hasTODOStorage) {
     console.log("We have todo storage!!! YIPPI!! Lets getjson!");
     
  
-    $.getJSON('https://todoo.netcare.se:1449/todo/' + toDoListName, function (data) {
+    $.getJSON(toDoServerURL + '/todo/' + toDoListName, function (data) {
 
 
 
@@ -604,6 +604,13 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
 
         toDoText = toDoText.trim();
         if (toDoText === "") return;
+        
+        // Avoid duplicate entries
+        for (var i = 0; i < storedToDos.length; i++) {
+            if (toDoText === storedToDos[i].Description) return;
+        }
+
+
         if (toDoText === "debugON") debugOn();
         if (toDoText === "debugOFF") debugOff();
         
@@ -686,27 +693,19 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
                 // {"CreatedDate":"\/Date(1451390900353+0100)\/","DeadLine":"\/Date(1451563700330+0100)\/","Description":"FOOOOOOD!","EstimationTime":100,"Finnished":true,"Id":-1,"Name":"MrInAHurry"}
 
 
-                var ToDoToStore = { "CreatedDate": tempToDo.CreatedDate, "DeadLine": tempToDo.DeadLine, "Description": tempToDo.Description, "EstimationTime": tempToDo.EstimationTime, "Finnished": tempToDo.Finnished, "Name": tempToDo.Name };
+                var toDoToStore = { "CreatedDate": tempToDo.CreatedDate, "DeadLine": tempToDo.DeadLine, "Description": tempToDo.Description, "EstimationTime": tempToDo.EstimationTime, "Finnished": tempToDo.Finnished, "Name": tempToDo.Name };
 
                 // Method = "POST", UriTemplate = "todo/{name}/new")]
                 $.ajax({
                     type: "POST",
                     url: toDoServerURL + '/todo/' + toDoListName + '/new',
-                    data: JSON.stringify({ todo: ToDoToStore }),
+                    data: JSON.stringify({ todo: toDoToStore }),
                     success: function (data) {
                         addTODOOItemSuccess(data, toDoLocalId);
                     },
-                    error: function (  jqXHR, testStatus, errorThrown ) {
-                        console.log("POST " + toDoServerURL + "/todo/" + toDoListName + "/new ERROR");
-                        console.log("testStatus: " + testStatus);
-                        console.log("errrorThrown: " + errorThrown);
-                        console.log("ToDoToStore values:");
-                        console.log("Created: " + ToDoToStore.CreatedDate);
-                        console.log("Deadline:" + ToDoToStore.DeadLine);
-                        console.log("Description:" + ToDoToStore.Description);
-                        console.log("Estimation:" + ToDoToStore.EstimationTime);
-                        console.log("Finnished:" + ToDoToStore.Finnished);
-                        console.log("Name:" + ToDoToStore.Name);
+                    error: function (jqXHR, testStatus, errorThrown) {
+                        addTODOOItemError(toDoToStore, toDoLocalId, jqXHR, testStatus, errorThrown);
+                        
                     },
 
                     dataType: "json",
@@ -753,12 +752,46 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
         } else {
             console.log("Weird, addToDoItemSuccess did not find toDoLocalId " + toDoLocalId + "in the storedToDos array...");
         }
-        
-
-        
-
-        // Must figure out how to update local todo list with the Id
+                
     }
+
+    function addTODOOItemError(toDoToStore, toDoLocalId, jqXHR, testStatus, errorThrown) {
+
+        console.log("POST " + toDoServerURL + "/todo/" + toDoListName + "/new ERROR");
+        console.log("testStatus: " + testStatus);
+        console.log("errrorThrown: " + errorThrown);
+        console.log("ToDoToStore values:");
+        console.log("Created: " + toDoToStore.CreatedDate);
+        console.log("Deadline:" + toDoToStore.DeadLine);
+        console.log("Description:" + toDoToStore.Description);
+        console.log("Estimation:" + toDoToStore.EstimationTime);
+        console.log("Finnished:" + toDoToStore.Finnished);
+        console.log("Name:" + toDoToStore.Name);
+
+        // Try to recover from false errors where data actually got posted
+        // Our main problem, we have no idea what Id the todo item has in the todoo server.
+        // Lets try to find out shall we?
+        
+        console.log("Error might be a false alarm. We are trying to recover...");
+        $.getJSON(toDoServerURL + '/todo/' + toDoListName, function (data) {
+            console.log("local id = " + toDoLocalId)
+            for (var i = 0; i < data.length; i++) {
+
+                if (data[i].Description === toDoToStore.Description) {
+                    console.log("Found a matching description!");
+                    console.log("Setting storedToDos[" + toDoLocalId + "] to " + data[i].Id);
+                    console.log("In the best of worlds, this will only happen once...");
+                    storedToDos[toDoLocalId].Id = data[i].Id;
+                }
+
+            }
+
+        });
+
+       
+    }
+
+
 
     function addTODOOChangeItemSuccess(data) {
 
