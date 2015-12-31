@@ -57,7 +57,7 @@ hasTODOStorage = (function () {
 
 var storedToDos = []; // Will be used to keep a json array with our todo items
 var highestLocalToDoId = 0; // Is needed when creating new todo items, each todo in stored todos need a unique ID never used in the current session.
-var nextAddedToDoLocalId = null;
+var nextAddedToDoLocalId = null; // Gets a value if user is adding a changed item
 
 
 // Get todo list from server storage if available
@@ -255,7 +255,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
         
             // Put the object into storage
             localStorage.setItem(toDoListName, JSON.stringify(storedToDos));
-            console.log("Stored to local storage: " + JSON.stringify(storedToDos));
+            if(debug) console.log("Stored to local storage: " + JSON.stringify(storedToDos));
 
         } else {
             // Sorry! No Web Storage support..
@@ -602,6 +602,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
 
         toDoText = $("#newtodo").val();
 
+        toDoText = toDoText.trim();
         if (toDoText === "") return;
         if (toDoText === "debugON") debugOn();
         if (toDoText === "debugOFF") debugOff();
@@ -633,7 +634,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
                 toDoText,
                 0,
                 false,
-                -1,
+                null,
                 toDoListName);
 
 
@@ -673,8 +674,8 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
         // If we have todoo server storage, we must either add or change the item now
         if (hasTODOStorage) {
             if (nextAddedToDoLocalId == null) {   // The item is a new item that need to be stored
-                nextAddedToDoLocalId = 0; // Just clearing
-                if (debug) console.log("add todo: storing a NEW item!");
+                // nextAddedToDoLocalId = 0; // Just clearing
+                console.log("add todo: storing a NEW item!");
 
                 // Because our todo object is not exactly like the servers, we need to transform it
                 //  Next refactoring: Try the object delete function
@@ -685,30 +686,47 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
                 // {"CreatedDate":"\/Date(1451390900353+0100)\/","DeadLine":"\/Date(1451563700330+0100)\/","Description":"FOOOOOOD!","EstimationTime":100,"Finnished":true,"Id":-1,"Name":"MrInAHurry"}
 
 
-                var ToDoToStore = { "CreatedDate": tempToDo.CreatedDate, "DeadLine": tempToDo.DeadLine, "Description": tempToDo.Description, "EstimationTime": tempToDo.EstimationTime, "Finnished": tempToDo.Finnished, "Id": tempToDo.Id, "Name": tempToDo.Name };
-
-
+                var ToDoToStore = { "CreatedDate": tempToDo.CreatedDate, "DeadLine": tempToDo.DeadLine, "Description": tempToDo.Description, "EstimationTime": tempToDo.EstimationTime, "Finnished": tempToDo.Finnished, "Name": tempToDo.Name };
 
                 // Method = "POST", UriTemplate = "todo/{name}/new")]
                 $.ajax({
                     type: "POST",
                     url: toDoServerURL + '/todo/' + toDoListName + '/new',
-                    success: addTODOOItemSuccess(),
+                    data: JSON.stringify({ todo: ToDoToStore }),
+                    success: function (data) {
+                        addTODOOItemSuccess(data, toDoLocalId);
+                    },
+                    error: function (  jqXHR, testStatus, errorThrown ) {
+                        console.log("POST " + toDoServerURL + "/todo/" + toDoListName + "/new ERROR");
+                        console.log("testStatus: " + testStatus);
+                        console.log("errrorThrown: " + errorThrown);
+                        console.log("ToDoToStore values:");
+                        console.log("Created: " + ToDoToStore.CreatedDate);
+                        console.log("Deadline:" + ToDoToStore.DeadLine);
+                        console.log("Description:" + ToDoToStore.Description);
+                        console.log("Estimation:" + ToDoToStore.EstimationTime);
+                        console.log("Finnished:" + ToDoToStore.Finnished);
+                        console.log("Name:" + ToDoToStore.Name);
+                    },
+
                     dataType: "json",
-                   
-                    data: JSON.stringify({todo:ToDoToStore}),
-                    // data: JSON.stringify(tempToDo),
                     contentType: 'application/json; charset=utf-8'
                 });
 
             } else { // We are dealing with an update
-                if (debug) console.log("add todo: UPDATING item!");
+                nextAddedToDoLocalId = null; // Just clearing
+                console.log("add todo: UPDATING item!");
                 
                 // Method = "PUT", UriTemplate = "todo/{name}/{id}/description/{description}")]
                 $.ajax({
                     type: "PUT",
                     url: toDoServerURL + '/todo/' + toDoListName + '/' + storedToDos[index].Id + '/description/' + storedToDos[index].Description,
-                    success: addTODOOChangeItemSuccess(),
+                    success: function (data) { addTODOOChangeItemSuccess(data); },
+                    error: function (jqXHR, testStatus, errorThrown) {
+                        console.log("PUT " + toDoServerURL + "/todo/" + toDoListName + "/" + storedToDos[index].Id + "/description/" + storedToDos[index].Description + " ERROR");
+                        console.log("testStatus: " + testStatus);
+                        console.log("errrorThrown: " + errorThrown);
+                    },
                     dataType: "json",
                     
                 });
@@ -723,16 +741,31 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
 
     }
 
-    function addTODOOItemSuccess() {
+    function addTODOOItemSuccess(data, toDoLocalId) {
 
-        console.log("Added new item to todoo server...");
+        console.log("Added new item to todoo server:" + data);
+        console.log("data.Description = " + data.Description);
+        console.log("data.Id = " + data.Id);
+        console.log("local id = " + toDoLocalId)
+        var index = findWithAttr(storedToDos, "LocalId", toDoLocalId);
+        if (index > -1) {
+            storedToDos[index].Id = data.Id;
+        } else {
+            console.log("Weird, addToDoItemSuccess did not find toDoLocalId " + toDoLocalId + "in the storedToDos array...");
+        }
+        
+
+        
+
         // Must figure out how to update local todo list with the Id
     }
 
-    function addTODOOChangeItemSuccess() {
+    function addTODOOChangeItemSuccess(data) {
 
         console.log("Added CHANGED item to todoo server...");
-        // Must figure out how to update local todo list with the Id
+        console.log("data.Description= " + data.Description);
+        console.log("data.Id= " + data.Id);
+        
     }
 
 
