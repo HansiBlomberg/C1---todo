@@ -12,6 +12,7 @@ var ListTypeEnum = {
 
 
 debug = false;
+// debug = true;
 if (debug) debugOn();
     
 debugtext();
@@ -62,12 +63,84 @@ hasTODOStorage = (function () {
 
 
 var storedToDos = []; // Will be used to keep a json array with our todo items
+var knownToDoNames = []; // Will be used to keep an array of known todo names
+console.log("knowntodonames = " + knownToDoNames);
 var highestLocalToDoId = 0; // Is needed when creating new todo items, each todo in stored todos need a unique ID never used in the current session.
 var nextAddedToDoLocalId = null; // Gets a value if user is adding a changed item
 
+readPersistedToDoNames();
+updateToDoListMenu();
 readPersistedToDo();
 
 
+
+function readPersistedToDoNames() {
+
+    if (hasLocalStorage) {
+
+        if (typeof (localStorage.getItem("lastUsedToDoListName")) !== "undefined") {
+            toDoListName = localStorage.getItem("lastUsedToDoName");
+            $("#listname").val(toDoListName);
+        }
+
+        if (typeof (localStorage.getItem("knownToDoListNames")) !== "undefined") {
+            var tempToDoNames = JSON.parse(localStorage.getItem("knownToDoListNames"));
+            if (tempToDoNames !== null) {
+                knownToDoNames = tempToDoNames;
+            }
+            if (debug) {
+                console.log("readPersistedToDoNames read tempToDoNames = " + tempToDoNames);
+                console.log("knowntodonames = " + knownToDoNames);
+            }
+        }
+    }
+    else {
+        // Sorry! No Web Storage support..
+        if (debug) alert("readPersistedToDoNames(): Ingen web storage support!");
+    }
+
+}
+
+function saveToDoNames() {
+
+    if (hasLocalStorage) {
+
+        // Put the object into storage
+        localStorage.setItem("lastUsedToDoName", toDoListName);
+        if (debug) console.log("Stored to local storage: lastUsedToDoName=" + toDoListName);
+
+        // Add the current list name if not already known
+        if (knownToDoNames === null) {
+            knownToDoNames.push(toDoListName);
+        } else if (knownToDoNames.indexOf(toDoListName) === -1) {
+            knownToDoNames.push(toDoListName);
+        }
+
+        localStorage.setItem("knownToDoListNames", JSON.stringify(knownToDoNames));
+        if (debug) console.log("Stored to local storage: knownToDoListNames" + JSON.stringify(knownToDoNames));
+
+
+
+    } else {
+        // Sorry! No Web Storage support..
+        if (debug) alert("Ingen web storage support!");
+    }
+
+}
+
+function updateToDoListMenu() {
+
+    $("#knowntodolists").empty();
+
+    for (i = 0; i < knownToDoNames.length; i++) {
+        // <li><a href="#Foo" onclick="runMyFunction(); return false;">Do it!</a></li>
+        $("#knowntodolists").append("<li><a href='#' onclick='loadToDoList(\"" + knownToDoNames[i] + "\"); return false;'>" + knownToDoNames[i] + "</a></li>");
+        // <option value="volvo">Volvo</option>
+        //$("#knowntodolists").append("<option value="+ knownToDoNames[i] + ">" + knownToDoNames[i] + "</option>");
+    }
+
+
+}
 
 function readPersistedToDo() {
     // Get todo list from server storage if available
@@ -185,6 +258,14 @@ function ShowHeadersWithItems() {
 }
 
 
+function loadToDoList(name) {
+
+    $("#listname").val(name);
+    $("#listnamechange").click();
+
+
+}
+
 
 function changeListName() {
 
@@ -195,6 +276,8 @@ function changeListName() {
 
     toDoListName = listName;
     console.log("changeListName changed toDoListName to " + listName);
+    saveToDoNames();
+    updateToDoListMenu();
     storedToDos = [];
     $("#todolist").empty();
     $("#donelist").empty();
