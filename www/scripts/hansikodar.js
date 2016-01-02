@@ -533,6 +533,18 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
         // Lets fire up the modal!
         // '<a data-toggle="modal" href="#wantToDeleteModal" class="todo-remove btn btn-danger btn-xs">Ta bort</a>';
 
+        // Insert the todo description into the modal
+        var index = findWithAttr(storedToDos, "LocalId", toDoLocalId);
+        if (index > -1) {
+            $("#tabortitemdescription").text(storedToDos[index].Description);
+        } else {
+            console.log("Weird, askToRemoveListItem did not find toDoLocalId " + toDoLocalId + "in the storedToDos array...");
+            $("#tabortitemdescription").text("Error: item description text not found");
+        }
+
+
+        
+        
 
     
         $('#wantToDeleteModal').modal({
