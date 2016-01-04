@@ -139,6 +139,12 @@ function updateToDoListMenu() {
         //$("#knowntodolists").append("<option value="+ knownToDoNames[i] + ">" + knownToDoNames[i] + "</option>");
     }
 
+    if (knownToDoNames.length > 0) {
+        $("#knowntodolists").parent().parent().show();
+    } else {
+        $("#knowntodolists").parent().parent().hide();
+    }
+
 
 }
 
@@ -166,6 +172,7 @@ function readPersistedToDo() {
 
     else {
         // Do we have local storage at least?
+        console.log("No todo storage, trying local storage");
         if (hasLocalStorage) {
             if (typeof (localStorage.getItem(toDoListName)) !== "undefined") {
                 storedToDos = JSON.parse(localStorage.getItem(toDoListName));
