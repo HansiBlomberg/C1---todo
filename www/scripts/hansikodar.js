@@ -750,12 +750,12 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
         // Avoid duplicate entries unless it is an edited item that is re-saved
         if (nextAddedToDoLocalId === null) {
             for (var i = 0; i < storedToDos.length; i++) {
-                if (toDoText === storedToDos[i].Description) return;
+                if (toDoText.toLowerCase() === storedToDos[i].Description.toLowerCase()) return;
             }
         } else { // If it is an edited item, allow duplicate if same id as before. Coded like this for readability.
             for (var i = 0; i < storedToDos.length; i++) {
                 
-                if (toDoText === storedToDos[i].Description && nextAddedToDoLocalId != storedToDos[i].LocalId) {
+                if (toDoText.toLowerCase() === storedToDos[i].Description.toLowerCase() && nextAddedToDoLocalId != storedToDos[i].LocalId) {
                     return;
                     console.log("nextAddedToDoLocalId= " + nextAddedToDoLocalId + "storedToDos[i].LocalId=" + storedToDos[i].LocalId);
                 }
