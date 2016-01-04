@@ -688,22 +688,30 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
     function removeItemFromTODOO(Id) {
 
         if (hasTODOStorage) {
-            if(debug) console.log("removeItemFromTODOO: We have todo storage!!!");
+            console.log("removeItemFromTODOO: We have todo storage!!!");
+            console.log("Calling " + toDoServerURL + "/todo/" + toDoListName + "/" + Id);
                        
             $.ajax({
                 type: "DELETE",
-                url: toDoServerURL + '/todo/' + toDoListName + '/' + Id + '',
+                url: toDoServerURL + '/todo/' + toDoListName + '/' + Id,
                 success: removeItemFromTODOOSuccess(),
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console.log("removeItemFronTODOO failed!");
+                    console.log(xhr.status);
+                    console.log(thrownError);
+                },
                 dataType: "json"
             });
             
-        }   
+        } else {
+            console.log("We dont have todoo storage, cant delete item from server...");
+        }
                       
     }
 
     function removeItemFromTODOOSuccess(result) {
 
-        if(debug) console.log("removeItemFromTODOOSuccess called")
+        console.log("removeItemFromTODOOSuccess called successfully")
     }
 
     
