@@ -38,20 +38,22 @@ var hasLocalStorage = (function () {
 
 
 // Do we have TODOO wcf storage check
+// Lets rewrite the codebase to handle
+// this in better ways
 
-$.ajaxSetup({
-    "error": function () {
-        hasTODOStorage = (function ()
-        { return false; });
-    }
-});
+//$.ajaxSetup({
+//    "error": function () {
+//        hasTODOStorage = (function ()
+//        { return false; });
+//    }
+//});
 
-hasTODOStorage = (function () {
+//hasTODOStorage = (function () {
     
    
-    $.getJSON(toDoServerURL + '/todo/' + toDoListName, function (data) { console.log("From hasTODOStorage data: " + data); });
-       return true;
-}());
+//    $.getJSON(toDoServerURL + '/todo/' + toDoListName, function (data) { console.log("From hasTODOStorage data: " + data); });
+//       return true;
+//}());
 
 
 
@@ -67,7 +69,11 @@ readPersistedToDoNames();
 updateToDoListMenu();
 readPersistedToDo();
 
+function LogAjaxError(jqXHR, textStatus,  errorThrown ) {
+    console.log("Ajax error " + textStatus);
+    console.log("incoming Text " + jqXHR.responseText);
 
+}
 
 function readPersistedToDoNames() {
 
@@ -145,29 +151,22 @@ function updateToDoListMenu() {
 
 function readPersistedToDo() {
     // Get todo list from server storage if available
-    if (hasTODOStorage) {
+    
 
-        console.log("We have todo storage!!! YIPPI!! Lets getjson!");
-        $.getJSON(toDoServerURL + '/todo/' + toDoListName, function (data) {
+    console.log("readPersistedtoDo trying to call " + toDoServerURL + "/todo/" + toDoListName);
+    $.getJSON(toDoServerURL + '/todo/' + toDoListName, function (data) {
 
-            console.log("data=" + data);
-            console.log("data length = " + data.length);
-            storedToDos = data;
+        console.log("data=" + data);
+        console.log("data length = " + data.length);
+        storedToDos = data;
 
-            PopulateToDoLists();
+        PopulateToDoLists();
 
+    }).error(function (jqXHR, textStatus, errorThrown) {
 
-
-        });
-
-        console.log("Now what???");
-
-
-    }
-
-    else {
-        // Do we have local storage at least?
-        console.log("No todo storage, trying local storage");
+        console.log("error " + textStatus);
+        console.log("incoming Text " + jqXHR.responseText);
+        console.log("No todoo server storage, trying local storage");
         if (hasLocalStorage) {
             if (typeof (localStorage.getItem(toDoListName)) !== "undefined") {
                 storedToDos = JSON.parse(localStorage.getItem(toDoListName));
@@ -176,10 +175,19 @@ function readPersistedToDo() {
             }
         }
         else {
-            // Sorry! No Web Storage support..
-            if (debug) alert("Ingen web storage support!");
+            // Sorry! No Local Storage support..
+            if (debug) alert("Sory no local storage support!");
         }
-    }
+
+
+    });
+
+        
+
+
+    
+       
+    
 }
 
 // Populate todo lists if we got some items from local or remote storage
@@ -340,10 +348,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
 
         // Can we?
         if (hasLocalStorage) {
-
-            // Build the JSON object - dont needed anymore!
-            // storedToDos = buildJSON();
-        
+   
             // Put the object into storage
             localStorage.setItem(toDoListName, JSON.stringify(storedToDos));
             if(debug) console.log("Stored to local storage: " + JSON.stringify(storedToDos));
@@ -459,15 +464,16 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
 
         debugtext();
 
-        // If we have a todoo server, save the changes
-        if (hasTODOStorage && index > -1) {
-            if (debug) console.log("removeItemFromTODOO: We have todo storage!!!");
+        // Try to store the changes to todoo server
+        if ( index > -1) {
+            if (debug) console.log("doneToDoItem: Trying to update item on todoo server");
             // Method = "PUT", UriTemplate = "todo/{name}/{id}/done")]
             $.ajax({
                 type: "PUT",
                 url: toDoServerURL + '/todo/' + toDoListName + '/' + storedToDos[index].Id + '/done',
-                success: changeTODOOItemToDoneSuccess(),
-                dataType: "json"
+                success: changeTODOOItemToDoneSuccess,
+                error: LogAjaxError,
+                // dataType: "json"
             });
 
         }
@@ -520,13 +526,13 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
         debugtext();
 
         // If we have a todoo server, save the changes
-        if (hasTODOStorage && index > -1) {
-            if (debug) console.log("removeItemFromTODOO: We have todo storage!!!");
+        if (index > -1) {
             // Method = "PUT", UriTemplate = "todo/{name}/{id}/done")]
             $.ajax({
                 type: "PUT",
                 url: toDoServerURL + '/todo/' + toDoListName + '/' + storedToDos[index].Id + '/notdone',
-                success: changeTODOOItemToNotDoneSuccess(),
+                success: changeTODOOItemToNotDoneSuccess,
+                error: LogAjaxError,
                 dataType: "json"
             });
 
@@ -652,8 +658,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
 
     function removeItemFromTODOO(Id) {
 
-        if (hasTODOStorage) {
-            console.log("removeItemFromTODOO: We have todo storage!!!");
+        
             console.log("Calling " + toDoServerURL + "/todo/" + toDoListName + "/" + Id);
                        
             $.ajax({
@@ -668,9 +673,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
                 dataType: "json"
             });
             
-        } else {
-            console.log("We dont have todoo storage, cant delete item from server...");
-        }
+       
                       
     }
 
@@ -798,7 +801,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
         debugtext();
 
         // If we have todoo server storage, we must either add or change the item now
-        if (hasTODOStorage) {
+        
             if (nextAddedToDoLocalId === null) {   // The item is a new item that need to be stored
                 // nextAddedToDoLocalId = 0; // Just clearing
                 console.log("add todo: storing a NEW item!");
@@ -827,7 +830,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
                         
                     },
 
-                    dataType: "json",
+                    // dataType: "json",   // This broke things because the server dont return in json
                     contentType: 'application/json; charset=utf-8'
                 });
 
@@ -845,17 +848,13 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
                         console.log("testStatus: " + testStatus);
                         console.log("errrorThrown: " + errorThrown);
                     },
-                    dataType: "json"
+                    // dataType: "json" // not needed!
                     
                 });
 
 
             }
-        }
-
-        //if(nextAddedToDoLocalId == null) {   // Then it is a new item
-            
-        //    var toDoLocalId = ++highestLocalToDoId;
+      
 
     }
 
@@ -886,6 +885,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
         console.log("Estimation:" + toDoToStore.EstimationTime);
         console.log("Finnished:" + toDoToStore.Finnished);
         console.log("Name:" + toDoToStore.Name);
+        console.log("JSON stringifyed data:" + JSON.stringify({ todo: toDoToStore }));
 
         // Try to recover from false errors where data actually got posted
         // Our main problem, we have no idea what Id the todo item has in the todoo server.
