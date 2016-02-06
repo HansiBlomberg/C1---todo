@@ -53,11 +53,6 @@ hasTODOStorage = (function () {
        return true;
 }());
 
-//var hasTODOStorage = (function () {
-//    return false;
-//}());
-
-
 
 
 
@@ -213,17 +208,7 @@ function PopulateToDoLists() {
     // Add event to the todo add item button
     $("#addtodo").click(addToDoItem);
 
-    // This will make the enter key work to add items from the todo input field
-   // $('#newtodo').bind("enterKey", addToDoItem);
 
-    //$('#newtodo').keyup(function (e) {
-    //    if (e.keyCode == 13) {
-    //        $(this).trigger("enterKey");
-    //    }
-    //});
-
-
-   
     $('#newtodo').keypress(function(event){
         if(event.keyCode == 13){
             $('#addtodo').click();
@@ -292,22 +277,6 @@ function changeListName() {
   
 }
 
-
-
-
-
-
-// I am not used anymore...
-function buildJSON() {
-
-    var toDos = new Array();
-
-    toDoToJSON("todolist", "testname", toDos);
-    toDoToJSON("donelist", "testname", toDos);
-
-    return toDos;
-
-}
 
 
 // Builds an array of toDoItem objects based on the ToDo list
@@ -631,10 +600,6 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
             console.log("Weird, askToRemoveListItem did not find toDoLocalId " + toDoLocalId + "in the storedToDos array...");
             $("#tabortitemdescription").text("Error: item description text not found");
         }
-
-
-        
-        
 
     
         $('#wantToDeleteModal').modal({
