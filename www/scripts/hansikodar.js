@@ -301,27 +301,28 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
 
     
         // Find the ToDo UL with the id of listId that we take as a parameter
-        $("ul#"+listId+" li").each( function( index, element ) {
+        $("ul#" + listId + " li").each(function (index, element) {
 
             var tempText = $(this).text();
             var descriptionText = tempText.substring(0, (tempText.length - cut));
             descriptionText = stripHTML(descriptionText); // Paranoid
 
-            if (debug) alert("Pushing " + descriptionText + " to the json array from list #"+ listId + " item " + (index + 1) + ". Done = " + ( listId == "donelist" ? "true" : "false"));
+            if (debug) alert("Pushing " + descriptionText + " to the json array from list #" + listId + " item " + (index + 1) + ". Done = " + (listId == "donelist" ? "true" : "false"));
 
-        
-           //  toDos.todo.push( { 
-           
+
+            //  toDos.todo.push( { 
+
             toDos.push({
-                
+
                 "CreatedDate": Date.now(),
                 "DeadLine": Date.now(),
                 "Description": descriptionText,
                 "EstimationTime": 0,
-                "Finnished" : listId == "donelist" ? true : false,
-                "Name": toDoListName });
-    
-        })
+                "Finnished": listId == "donelist" ? true : false,
+                "Name": toDoListName
+            });
+
+        });
        
     
 }
@@ -395,7 +396,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
    
         // Common rows
         // listItem += '<div>';
-        listItem += '    <li class="row list-group-item list-group-item-info">'
+        listItem += '    <li class="row list-group-item list-group-item-info">';
         listItem += toDoText;
         listItem += '      <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2 btn-group btn-group-xs todo-item-buttons pull-right" role="group" aria-label="...">';
 
@@ -472,7 +473,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
                 type: "PUT",
                 url: toDoServerURL + '/todo/' + toDoListName + '/' + storedToDos[index].Id + '/done',
                 success: changeTODOOItemToDoneSuccess,
-                error: LogAjaxError,
+                error: LogAjaxError
                 // dataType: "json"
             });
 
@@ -532,8 +533,8 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
                 type: "PUT",
                 url: toDoServerURL + '/todo/' + toDoListName + '/' + storedToDos[index].Id + '/notdone',
                 success: changeTODOOItemToNotDoneSuccess,
-                error: LogAjaxError,
-                dataType: "json"
+                error: LogAjaxError
+                // dataType: "json"
             });
 
         }
@@ -669,8 +670,8 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
                     console.log("removeItemFronTODOO failed!");
                     console.log(xhr.status);
                     console.log(thrownError);
-                },
-                dataType: "json"
+                }
+                // dataType: "json"
             });
             
        
@@ -721,11 +722,12 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
                 if (toDoText.toLowerCase() === storedToDos[i].Description.toLowerCase()) return;
             }
         } else { // If it is an edited item, allow duplicate if same id as before. Coded like this for readability.
-            for (var i = 0; i < storedToDos.length; i++) {
+            for (var j = 0; j < storedToDos.length; j++) {
                 
-                if (toDoText.toLowerCase() === storedToDos[i].Description.toLowerCase() && nextAddedToDoLocalId != storedToDos[i].LocalId) {
+                if (toDoText.toLowerCase() === storedToDos[j].Description.toLowerCase() && nextAddedToDoLocalId != storedToDos[j].LocalId) {
+                    
+                    console.log("nextAddedToDoLocalId= " + nextAddedToDoLocalId + "storedToDos[j].LocalId=" + storedToDos[j].LocalId);
                     return;
-                    console.log("nextAddedToDoLocalId= " + nextAddedToDoLocalId + "storedToDos[i].LocalId=" + storedToDos[i].LocalId);
                 }
 
             }
@@ -847,7 +849,7 @@ function toDoToJSON(listId, name, toDos) {   // Needs to be redone totally based
                         console.log("PUT " + toDoServerURL + "/todo/" + toDoListName + "/" + storedToDos[index].Id + "/description/" + storedToDos[index].Description + " ERROR");
                         console.log("testStatus: " + testStatus);
                         console.log("errrorThrown: " + errorThrown);
-                    },
+                    }
                     // dataType: "json" // not needed!
                     
                 });
